@@ -1,51 +1,17 @@
-import {StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, AsyncStorage} from 'react-native';
-import React, {useEffect, useState} from "react";
+import {StyleSheet, Text, View, TouchableOpacity, ScrollView, Image} from 'react-native';
+import React, {useState} from "react";
 import {Icon} from 'react-native-elements'
-import {MOODS_TYPE, getItems, setItems} from "@config/store"
+import {MOODS_TYPE} from "@config/store"
 import Mood from "@components/Mood";
+import {useDispatch, useSelector} from "react-redux";
+import {storeMood, resetMoods, deleteMood} from "@redux/moods/actions"
 
 const List = () => {
 
-    const [moods, setMoods] = useState([]);
+    const moods = useSelector(state => state.moods.moods);
+    const dispatch = useDispatch();
     const [displayAdd, setDisplayAdd] = useState(false);
     const [scroller, setScroller] = useState(React.createRef());
-
-    useEffect(() => {
-        const fetchMoods = async () => {
-            let storedMoods = await getItems("moods");
-            if (storedMoods === null) {
-                storedMoods = []
-            }
-            setMoods(storedMoods)
-        }
-        fetchMoods();
-    }, [])
-
-    const addMood = (mood_type) => {
-        const updatedMoods = [...moods, {
-            id: Math.floor(Math.random() * 999),
-            title: mood_type.title,
-            mood: mood_type.mood,
-            color: mood_type.color,
-        }]
-        setItems("moods", updatedMoods);
-        setMoods(updatedMoods);
-        setTimeout(() => {
-            scroller.scrollTo({x: 1000, y: 0, animated: true})
-        }, 100)
-    }
-
-    const deleteMood = (mood) => {
-        const updatedMoods = moods.filter(item => item.id !== mood.id)
-        setItems("moods", updatedMoods);
-        setMoods(updatedMoods);
-    }
-
-    const resetMoods = () => {
-        setMoods([])
-        scroller.scrollTo({x: 0, y: 0, animated: false})
-        AsyncStorage.removeItem("moods")
-    }
 
     const _getBgColorStyle = (mood) => {
         const colors = ["#E270DF", "#EC5689", "#6ad8f9", "#ADCA3E", "#FAD94C"];
@@ -58,13 +24,14 @@ const List = () => {
                 setScroller(scroller)
             }}>
                 <View style={styles.moods}>
-                    {moods.map((mood) => (
-                        <Mood
-                            mood={mood}
-                            deleteMoodFunction={deleteMood}
-                            key={mood.id.toString()}
-                        >{mood.title}</Mood>
-                    ))}
+                    {moods && moods.length > 0 && moods.map((mood) => (
+                            <Mood
+                                mood={mood}
+                                deleteMoodFunction={deleteMood}
+                                key={mood.id.toString()}
+                            >{mood.title}</Mood>
+                        )
+                    )}
                 </View>
             </ScrollView>
             {displayAdd && (
@@ -76,14 +43,22 @@ const List = () => {
                                 {backgroundColor: _getBgColorStyle(mood_type.mood)},
                             ]}
                             key={mood_type.id}
-                            onPress={() => addMood(mood_type)}
+                            onPress={function () {
+                                dispatch(storeMood(mood_type))
+                                setTimeout(() => {
+                                    scroller.scrollTo({x: 1000, y: 0, animated: true})
+                                })
+                            }}
                         >
                             <Image style={styles.moodButtonImage} source={mood_type.imagePath}/>
                         </TouchableOpacity>
                     ))}
                     <TouchableOpacity
                         style={styles.resetButton}
-                        onPress={() => resetMoods()}>
+                        onPress={function () {
+                            dispatch(resetMoods())
+                            scroller.scrollTo({x: 0, y: 0, animated: false})
+                        } }>
                         <Icon name="refresh" color={"white"}/>
                     </TouchableOpacity>
                 </View>
@@ -163,4 +138,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default List
+export default List;

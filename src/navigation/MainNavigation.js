@@ -1,6 +1,6 @@
 import React from "react";
 import {TouchableOpacity} from "react-native";
-import {NavigationContainer, DrawerActions} from "@react-navigation/native";
+import {NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from "@react-navigation/stack";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {createDrawerNavigator} from '@react-navigation/drawer';
@@ -8,8 +8,14 @@ import {Icon} from "react-native-elements";
 import List from "@screens/List"
 import Infos from "@screens/Infos"
 import Profile from "@screens/Profile"
+import CustomDrawerContent from "./CustomDrawerContent"
 
 const Tabs = createBottomTabNavigator()
+const Stack = createStackNavigator();
+const ProfileStack = createStackNavigator();
+const Drawer = createDrawerNavigator()
+
+
 const TabsNavigation = () => (
     <Tabs.Navigator>
         <Tabs.Screen name="Main" component={List}/>
@@ -17,39 +23,51 @@ const TabsNavigation = () => (
     </Tabs.Navigator>
 )
 
-const RootStack = createStackNavigator();
-const RootStackNavigation = () => (
-    <RootStack.Navigator>
-        <RootStack.Screen
+const StackNavigation = () => (
+    <Stack.Navigator>
+        <Stack.Screen
             name="RootStack"
             component={TabsNavigation}
-            options={(props) => ({
+            options={({navigation}) => ({
                 title: "Mr Mood",
-                headerTitleStyle: {
-                    alignSelf: "flex-end",
-                    marginRight: 20
-                },
+                headerTitleStyle: {alignSelf: "flex-end", marginRight: 20},
                 headerLeft: () => (
-                    <TouchableOpacity
-                        style={{marginLeft: 20}}
-                        onPress={() => {
-                            console.log(props)
-                            props.navigation.dispatch(DrawerActions.toggleDrawer())
-                        }}
-                    >
+                    <TouchableOpacity style={{marginLeft: 20}} onPress={() => {
+                        navigation.toggleDrawer()
+                    }}>
+                        <Icon name='user' type='font-awesome'/>
+                    </TouchableOpacity>
+                )
+            })}
+        />
+    </Stack.Navigator>
+)
+
+const ProfileNavigation = () => (
+    <Stack.Navigator>
+        <Stack.Screen
+            name={"ProfileStack"}
+            component={Profile}
+            options={({navigation}) => ({
+                title: "Mr Mood",
+                headerTitleStyle: {alignSelf: "flex-end", marginRight: 20},
+                headerLeft: () => (
+                    <TouchableOpacity style={{marginLeft: 20}} onPress={() => {
+                        navigation.toggleDrawer()
+                    }}>
                         <Icon name='user' type='font-awesome'/>
                     </TouchableOpacity>
                 )
             })}/>
-    </RootStack.Navigator>
+    </Stack.Navigator>
 )
 
-const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => (
     <NavigationContainer>
-        <Drawer.Navigator name="Mr Mood">
-            <Drawer.Screen name="Home" component={RootStackNavigation}/>
-            <Drawer.Screen name="Profile" component={Profile}/>
+        <Drawer.Navigator name="Mr Mood"
+                          drawerContent={(props) => <CustomDrawerContent {...props} />}>
+            <Drawer.Screen name="Home" component={StackNavigation}/>
+            <Drawer.Screen name="Profile" component={ProfileNavigation}/>
         </Drawer.Navigator>
     </NavigationContainer>
 

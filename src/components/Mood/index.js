@@ -1,13 +1,16 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text} from 'react-native';
 import React from "react";
+import {useDispatch} from "react-redux";
+
 
 const Mood = (props) => {
 
     const {mood, deleteMoodFunction} = props;
+    const dispatch = useDispatch();
 
     return (
         <Pressable
-            onLongPress={() => deleteMoodFunction(mood)}
+            onLongPress={() => dispatch(deleteMoodFunction(mood))}
             style={[styles.mood,
             {backgroundColor: mood.color},
             {height: 20 + mood.mood * 15 + '%'}]}>
