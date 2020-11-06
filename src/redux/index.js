@@ -4,9 +4,11 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {composeWithDevTools} from "redux-devtools-extension";
 import thunk from "redux-thunk";
 import moods from "@redux/moods/reducer"
+import user from "@redux/user/reducer"
 
 const reducers = {
     moods,
+    user,
 }
 
 const persistConfig = {

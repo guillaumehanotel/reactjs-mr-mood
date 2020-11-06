@@ -12,6 +12,7 @@ const List = () => {
     const dispatch = useDispatch();
     const [displayAdd, setDisplayAdd] = useState(false);
     const [scroller, setScroller] = useState(React.createRef());
+    const isLogged = useSelector(state => state.user.isLogged);
 
     const _getBgColorStyle = (mood) => {
         const colors = ["#E270DF", "#EC5689", "#6ad8f9", "#ADCA3E", "#FAD94C"];
@@ -20,20 +21,21 @@ const List = () => {
 
     return (
         <View style={styles.wrapper}>
-            <ScrollView horizontal={true} ref={(scroller) => {
-                setScroller(scroller)
-            }}>
-                <View style={styles.moods}>
-                    {moods && moods.length > 0 && moods.map((mood) => (
-                            <Mood
-                                mood={mood}
-                                deleteMoodFunction={deleteMood}
-                                key={mood.id.toString()}
-                            >{mood.title}</Mood>
-                        )
-                    )}
-                </View>
-            </ScrollView>
+            {isLogged ? (
+                <ScrollView horizontal={true} ref={(scroller) => {
+                    setScroller(scroller)
+                }}>
+                    <View style={styles.moods}>
+                        {moods && moods.length > 0 && moods.map((mood) => (
+                                <Mood
+                                    mood={mood}
+                                    deleteMoodFunction={deleteMood}
+                                    key={mood.id.toString()}
+                                >{mood.title}</Mood>
+                            )
+                        )}
+                    </View>
+                </ScrollView>) : (<Text>Il faut être connecté pour voir vos Moods</Text>)}
             {displayAdd && (
                 <View style={styles.moodButtonList}>
                     {displayAdd && MOODS_TYPE.map((mood_type) => (
@@ -58,16 +60,18 @@ const List = () => {
                         onPress={function () {
                             dispatch(resetMoods())
                             scroller.scrollTo({x: 0, y: 0, animated: false})
-                        } }>
+                        }}>
                         <Icon name="refresh" color={"white"}/>
                     </TouchableOpacity>
                 </View>
             )}
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => setDisplayAdd(!displayAdd)}>
-                <Text style={styles.addButtonText}>{displayAdd ? "-" : "+"}</Text>
-            </TouchableOpacity>
+            {isLogged && (
+                <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => setDisplayAdd(!displayAdd)}>
+                    <Text style={styles.addButtonText}>{displayAdd ? "-" : "+"}</Text>
+                </TouchableOpacity>)
+            }
         </View>
     );
 }

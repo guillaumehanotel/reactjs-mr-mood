@@ -1,10 +1,18 @@
-import {Text, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import React from "react";
+import {useDispatch} from "react-redux";
+import {login} from "../../redux/user/actions";
 
 const Profile = () => {
+
+    const dispatch = useDispatch();
+
     return (
         <View>
-            <Text>Hello World</Text>
+            <TouchableOpacity
+                onPress={() => dispatch(login())}>
+                <Text>Se connecter</Text>
+            </TouchableOpacity>
         </View>
     )
 }
